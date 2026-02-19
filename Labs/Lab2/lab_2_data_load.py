@@ -36,17 +36,24 @@ def plot_leg_path(data_dictionary):
     plt.title('End Effector trajectory')
     plt.xlabel('EE X(m)')
     plt.ylabel('EE Z(m)')
+    plt.savefig('end_effector_trajectory.png')
     plt.show()
-
+    plt.figure()
     plt.plot(time_stamp_list,z_ee_f )
+    plt.plot(time_stamp_list,x_ee_f )
+    plt.plot(time_stamp_list,y_ee_f )
+    plt.legend(['Z', 'X', 'Y'])
+
+
     plt.title('End Effector Z vs Time')
     plt.xlabel('Time(s)')
     plt.ylabel('EE Z (m)')
+    plt.savefig('end_effector_z_vs_time.png')
     plt.show()
 
 
 
 ##### MAIN ######
-data_loader = DataLoader('./lab_2_datab.pkl')
+data_loader = DataLoader('./lab_2_data.pkl')
 data_dictionary = data_loader.load()
 plot_leg_path(data_dictionary)

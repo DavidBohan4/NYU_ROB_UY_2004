@@ -130,7 +130,7 @@ class ForwardKinematics(Node):
     # FK for back left leg
     def forward_kinematics_b(self, theta1, theta2, theta3):
 # T_0_1 (base_link to leg_front_l_1)
-        T_0_1 = self.translation(-0.02, 0.04, 0)
+        T_0_1 = self.translation(-0.08, 0.04, 0)
 
         ## TODO: Implement the transformation matrix from leg_front_l_1 to leg_front_l_2
         T_1_2 = self.rotation_y(theta1) @ self.translation(0, 0.035, 0)  
@@ -158,15 +158,15 @@ class ForwardKinematics(Node):
             theta1_f = self.joint_positions[0] - (-1.565)
             theta2_f = - (self.joint_positions[1] - (-0.071)) # - because of the sign convention
             theta3_f = self.joint_positions[2] - (2.427)
-            theta1_b = self.joint_positions[3] + 0
-            theta2_b = self.joint_positions[4] + 0
-            theta3_b = self.joint_positions[5] + 0
+            theta1_b = self.joint_positions[3] - (-1.578)
+            theta2_b = -(self.joint_positions[4] - (-0.006)) 
+            theta3_b = self.joint_positions[5] - 2.372
             end_effector_position_f = self.forward_kinematics_f(theta1_f, theta2_f, theta3_f)
             end_effector_position_b = self.forward_kinematics_b(theta1_b, theta2_b, theta3_b)
 
             # Check for collision
             distance = np.linalg.norm(end_effector_position_f - end_effector_position_b) 
-            collision_threshold = 0.02
+            collision_threshold = 0.06
             if distance < collision_threshold:
                 sound.play()
             
@@ -210,7 +210,7 @@ class ForwardKinematics(Node):
             position = Float64MultiArray()
             position.data = end_effector_position_f
             self.position_publisher.publish(position)
-            # self.get_logger().info(f"theta1_b={theta1_b:.3f}, theta2_b={theta2_b:.3f}, theta3_b={theta3_b:.3f}")
+            self.get_logger().info(f"theta1_b={theta1_b:.3f}, theta2_b={theta2_b:.3f}, theta3_b={theta3_b:.3f}")
             # self.get_logger().info(
             #     f"End-Effector Position: x={end_effector_position_f[0]:.2f}, y={end_effector_position_f[1]:.2f}, z={end_effector_position_f[2]:.2f}"
             # )

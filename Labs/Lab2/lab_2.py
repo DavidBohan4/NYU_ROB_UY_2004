@@ -124,7 +124,7 @@ class ForwardKinematics(Node):
         T_0_ee = T_0_1 @ T_1_2 @ T_2_3 @ T_3_ee
 
         # TODO: Extract the end-effector position. The end effector position is a 3x1 vector (not in homogenous coordinates)
-        end_effector_position = T_0_ee @ np.array([0,0,0,1]) 
+        end_effector_position = (T_0_ee @ np.array([0,0,0,1]) )[:3]
         return end_effector_position
 
     # FK for back left leg
@@ -148,7 +148,7 @@ class ForwardKinematics(Node):
         T_0_ee = T_0_1 @ T_1_2 @ T_2_3 @ T_3_ee
 
         # TODO: Extract the end-effector position. The end effector position is a 3x1 vector (not in homogenous coordinates)
-        end_effector_position = T_0_ee @ np.array([0,0,0,1]) 
+        end_effector_position = (T_0_ee @ np.array([0,0,0,1]) )[:3] 
         return end_effector_position
 
 
@@ -164,6 +164,12 @@ class ForwardKinematics(Node):
             theta3_b = self.joint_positions[5] + 0
             end_effector_position_f = self.forward_kinematics_f(theta1_f, theta2_f, theta3_f)
             end_effector_position_b = self.forward_kinematics_b(theta1_b, theta2_b, theta3_b)
+
+            # Check for collision
+            distance = np.linalg.norm(end_effector_position_f - end_effector_position_b) 
+            collision_threshold = 0.02
+            if distance < collision_threshold:
+                sound.play()
             
             time_stamp = time.time() - self.start_time
             self.log_data(time_stamp, theta1_f, theta2_f, theta3_f, theta1_b, theta2_b, theta3_b, end_effector_position_f, end_effector_position_b)

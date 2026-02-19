@@ -107,18 +107,18 @@ class ForwardKinematics(Node):
     # FK for forward left leg
     def forward_kinematics_f(self, theta1, theta2, theta3):
         # T_0_1 (base_link to leg_front_l_1)
-        T_0_1 = self.translation(0.14, 0.04, 0) #@ self.rotation_x(1.57080) @ self.rotation_z(theta1)
+        T_0_1 = self.translation(0.070, 0.04, 0)
 
         ## TODO: Implement the transformation matrix from leg_front_l_1 to leg_front_l_2
-        T_1_2 = self.rotation_z(theta1) @ self.translation(0, 0.025, 0)  
+        T_1_2 = self.rotation_y(theta1) @ self.translation(0, 0.035, 0)  
 
         # T_2_3 (leg_front_l_2 to leg_front_l_3)
         ## TODO: Implement the transformation matrix from leg_front_l_2 to leg_front_l_3
-        T_2_3 = self.rotation_y(theta2) @ self.translation(0.055, 0, -0.060) 
+        T_2_3 = self.rotation_z(theta2) @ self.translation(0.055, 0.02, -0.065) 
 
         # T_3_ee (leg_front_l_3 to end-effector)
         ## TODO: Implement the transformation matrix from leg_front_l_3 to end effector
-        T_3_ee = self.rotation_y(theta3) @ self.translation(0.08, 0, 0) 
+        T_3_ee = self.rotation_y(theta3) @ self.translation(0.0, 0, -0.08) 
 
         # TODO: Compute the final transformation. T_0_ee is the multiplication of the previous transformation matrices
         T_0_ee = T_0_1 @ T_1_2 @ T_2_3 @ T_3_ee
@@ -129,26 +129,25 @@ class ForwardKinematics(Node):
 
     # FK for back left leg
     def forward_kinematics_b(self, theta1, theta2, theta3):
-
-        # T_0_1 (base_link to leg_front_l_1)
-        T_0_1 = self.translation(-0.013, 0.04, 0) #@ self.rotation_x(1.57080) @ self.rotation_z(theta1)
+# T_0_1 (base_link to leg_front_l_1)
+        T_0_1 = self.translation(-0.02, 0.04, 0)
 
         ## TODO: Implement the transformation matrix from leg_front_l_1 to leg_front_l_2
-        T_1_2 = self.rotation_z(theta1) @ self.translation(0, 0.025, 0)  
+        T_1_2 = self.rotation_y(theta1) @ self.translation(0, 0.035, 0)  
 
         # T_2_3 (leg_front_l_2 to leg_front_l_3)
         ## TODO: Implement the transformation matrix from leg_front_l_2 to leg_front_l_3
-        T_2_3 = self.rotation_y(theta2) @ self.translation(0.055, 0, -0.060) 
+        T_2_3 = self.rotation_z(theta2) @ self.translation(0.055, 0.02, -0.065) 
 
         # T_3_ee (leg_front_l_3 to end-effector)
         ## TODO: Implement the transformation matrix from leg_front_l_3 to end effector
-        T_3_ee = self.rotation_y(theta3) @ self.translation(0.08, 0, 0) 
+        T_3_ee = self.rotation_y(theta3) @ self.translation(0.0, 0, -0.08) 
 
         # TODO: Compute the final transformation. T_0_ee is the multiplication of the previous transformation matrices
         T_0_ee = T_0_1 @ T_1_2 @ T_2_3 @ T_3_ee
 
         # TODO: Extract the end-effector position. The end effector position is a 3x1 vector (not in homogenous coordinates)
-        end_effector_position = (T_0_ee @ np.array([0,0,0,1]) )[:3] 
+        end_effector_position = (T_0_ee @ np.array([0,0,0,1]) )[:3]
         return end_effector_position
 
 
@@ -191,10 +190,27 @@ class ForwardKinematics(Node):
             marker.pose.position.z = end_effector_position_f[2]
             self.marker_publisher.publish(marker)
 
+            marker_back = Marker()
+            marker_back.header.frame_id = "/base_link"
+            marker_back.header.stamp = self.get_clock().now().to_msg()
+            marker_back.type = marker_back.SPHERE
+            marker_back.id = 1
+            marker_back.color.r = 0.0
+            marker_back.color.g = 0.0
+            marker_back.color.b = 1.0
+            marker_back.color.a = 1.0
+            marker_back.scale.x = 0.05
+            marker_back.scale.y = 0.05
+            marker_back.scale.z = 0.05
+            marker_back.pose.position.x = end_effector_position_b[0]
+            marker_back.pose.position.y = end_effector_position_b[1]
+            marker_back.pose.position.z = end_effector_position_b[2]
+            self.marker_publisher.publish(marker_back)
+
             position = Float64MultiArray()
             position.data = end_effector_position_f
             self.position_publisher.publish(position)
-            # self.get_logger().info(f"theta1_f={theta1_f:.3f}, theta2_f={theta2_f:.3f}, theta3_f={theta3_f:.3f}")
+            # self.get_logger().info(f"theta1_b={theta1_b:.3f}, theta2_b={theta2_b:.3f}, theta3_b={theta3_b:.3f}")
             # self.get_logger().info(
             #     f"End-Effector Position: x={end_effector_position_f[0]:.2f}, y={end_effector_position_f[1]:.2f}, z={end_effector_position_f[2]:.2f}"
             # )
